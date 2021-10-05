@@ -1,0 +1,7 @@
+__pycache__/
+venv/
+.vscode/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
