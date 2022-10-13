@@ -1,0 +1,49 @@
+---
+version: "3.7"
+services:
+  flower:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: flower
+    depends_on:
+      - redis
+    entrypoint: /usr/src/app/entrypoint.sh
+    environment:
+      - APP_NAME=flower
+    ports:
+      - "5555:5555"
+    restart: always
+    volumes:
+      - .:/usr/src/app
+
+  redis:
+    container_name: redis
+    image: redis:alpine3.13
+    ports:
+      - "6379:6379"
+
+  rediscommander:
+    container_name: rediscommander
+    environment:
+      REDIS_HOSTS: redis
+    image: rediscommander/redis-commander
+    ports:
+      - "8081:8081"
+    restart: always
+
+  worker:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: worker
+    depends_on:
+      - redis
+    entrypoint: /usr/src/app/entrypoint.sh
+    environment:
+      - APP_NAME=worker
+      - CELERY_POOL=prefork
+      - LOG_LEVEL=DEBUG
+    restart: always
+    volumes:
+      - .:/usr/src/app
